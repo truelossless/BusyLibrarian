@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
     "build": "nuxt build",
-    "start": "cross-env PORT=5299 NODE_ENV=production node server/index.js",
+    "start": "cross-env PORT=5298 NODE_ENV=production node server/index.js",
     "generate": "nuxt generate"
   },
   "dependencies": {
