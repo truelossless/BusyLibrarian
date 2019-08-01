@@ -3,15 +3,17 @@
     <h1>Transmission</h1>
     <p>
       <em>Currently, only transmission is supported.</em><br>
-      <em>Changing data here may require a restart of BusyLibrarian.</em>
+      <em>Changing data here will require a restart of BusyLibrarian.</em>
     </p>
     <el-form label-width="80px">
       
       <h3>Remote details</h3>
       <p>Where is located your transmission client ?</p>
       <p>Make sure transmission-daemon is installed.</p>
+      <p>For the host, don't put a leading <code>http://</code>.</p>
+      <p>Example: <code>mywebsite.com</code></p>
 
-      <el-form-item label="Url">
+      <el-form-item label="Host">
         <el-input v-model="url"></el-input>
       </el-form-item>
       <el-form-item label="Port">
