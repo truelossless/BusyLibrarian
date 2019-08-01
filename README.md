@@ -62,7 +62,7 @@ You can use pm2 to do that. It will also restart BusyLibrarian if it crashes.
 $ npm install pm2 -g
 
 # start BusyLibrarian with pm2
-$ pm2 start npm -- start
+$ pm2 start --name BusyLibrarian npm -- start
 
 # configure pm2 to run as a daemon
 $ pm2 startup
