@@ -1,6 +1,5 @@
 // web server
 const express = require('express');
-const session = require('express-session');
 const bodyParser = require('body-parser');
 const app = express();
 
@@ -70,13 +69,6 @@ if (settings.general.login) {
   });
   app.use(auth.connect(basic));
 }
-
-// session middleware
-app.use(session({
-  secret: 'busysaaaalt!',
-  resave: false,
-  saveUninitialized: false,
-}))
 
 // Import and Set Nuxt.js options
 const config = require('../nuxt.config.js');

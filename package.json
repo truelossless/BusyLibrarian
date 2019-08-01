@@ -16,7 +16,6 @@
     "cross-env": "^5.2.0",
     "element-ui": "^2.4.11",
     "express": "^4.16.4",
-    "express-session": "^1.16.2",
     "http-auth": "^3.2.3",
     "nuxt": "^2.0.0",
     "transmission": "^0.4.9",
