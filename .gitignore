@@ -1,4 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
+
+# exclude settings
+settings.json
+
 ### Node template
 # Logs
 *.log
