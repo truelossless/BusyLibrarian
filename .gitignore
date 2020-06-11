@@ -3,6 +3,9 @@
 # exclude settings
 settings.json
 
+# logs
+log.txt
+
 ### Node template
 # Logs
 *.log
