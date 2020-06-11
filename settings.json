@@ -1,0 +1,24 @@
+{
+    "general": {
+        "login": false,
+        "username": "",
+        "password": ""
+    },
+    "provider": {
+        "url": "",
+        "apiKey": ""
+    },
+    "downloader": {
+        "url": "",
+        "port": "",
+        "username": "",
+        "password": "",
+        "dir": ""
+    },
+    "processing": {
+        "calibre": false,
+        "url": "",
+        "username": "",
+        "password": ""
+    }
+}
