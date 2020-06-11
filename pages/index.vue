@@ -6,24 +6,39 @@
         <el-input v-model="search"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="searchGoodReads">Search</el-button>
+        <el-button type="primary" @click="searchClicked">Search</el-button>
+      </el-form-item>
+    </el-form>
+    <el-form>
+      <el-form-item>
+        <el-checkbox v-model="bypass">Bypass Google books search</el-checkbox>
       </el-form-item>
     </el-form>
 
     <el-card v-for="(result, i) in GSResults" :key="result.id" class="book-list">
       <el-row type="flex" justify="space-between">
         <el-col :span="16">
-          <h2>{{ result.title }}</h2>
-          <p>{{ result.author }}</p>
+          <h2>{{ result.volumeInfo.title }}</h2>
+          <p v-if="result.volumeInfo.authors">{{ result.volumeInfo.authors.join(', ') }}</p>
           <el-button
             ref="download-buttons"
-            @click="download($event, result, i)"
+            @click="GBDownload($event, result, i)"
             type="primary"
             icon="el-icon-download"
           >Download</el-button>
         </el-col>
         <el-col :span="8">
-          <img :src="result.image" alt="book cover" />
+          <img
+            v-if="result.volumeInfo.imageLinks"
+            :src="result.volumeInfo.imageLinks.thumbnail"
+            alt="book cover"
+          />
+          <img
+            v-else
+            class="missing-cover"
+            src="@/assets/img/missing_book.svg"
+            alt="missing book cover"
+          />
         </el-col>
       </el-row>
     </el-card>
@@ -43,12 +58,16 @@
       <h3>Searching for: "{{ this.formattedSearch }}"</h3>
       <div v-if="retryDownload">
         <p>No result found, looking only for "{{ selectedBookTitle }}" ...</p>
-        <p v-if="retryFailed">Still no result, try switching to a different provider ... :'(</p>
+        <p v-if="retryFailed">No result, try switching to a different provider ... :'(</p>
         <div v-else>
           <p>{{ torznabResults.length }} result{{ torznabResults.length === 1 ? '' : 's' }} found now !</p>
           <p>The result may consequently not be accurate.</p>
           <p>If one result seems alright, you can manually download it.</p>
         </div>
+      </div>
+      <div v-else-if="bypass">
+        <p>{{ torznabResults.length }} result{{ torznabResults.length === 1 ? '' : 's' }} found !</p>
+        <p>Pick the book you wish to download ...</p>
       </div>
       <div v-else>
         <p>{{ torznabResults.length }} result{{ torznabResults.length === 1 ? '' : 's' }} found !</p>
@@ -61,7 +80,7 @@
           <el-col :span="21">
             <p>{{ result.title }}</p>
           </el-col>
-          <el-col :span="2" v-if="retryDownload">
+          <el-col :span="2" v-if="retryDownload || bypass">
             <el-button icon="el-icon-download" @click="addTorrent(result.enclosure)" circle></el-button>
           </el-col>
         </el-row>
@@ -86,7 +105,8 @@ export default {
       torznabResults: [],
       processing: 0,
       retryDownload: false,
-      retryFailed: false
+      retryFailed: false,
+      bypass: false
     };
   },
 
@@ -95,7 +115,7 @@ export default {
   },
 
   methods: {
-    async searchGoodReads() {
+    async searchClicked() {
       // reset stuff
       this.processing = 0;
       this.GSResults = [];
@@ -103,14 +123,30 @@ export default {
       this.retryDownload = false;
       this.retryFailed = false;
 
+      // bypass google books search
+      if (this.bypass) {
+        this.formattedSearch = this.search;
+        this.processing += 2;
+        await this.searchTorznab(this.search);
+      } else {
+        this.searchGoogleBooks();
+      }
+    },
+
+    async searchGoogleBooks() {
       try {
-        // because of CORS we can't parse directly the API
-        this.GSResults = await this.$axios.$post("/api/goodreads_search/", {
-          q: this.search
-        });
+        let res = await this.$axios.$get(
+          "https://www.googleapis.com/books/v1/volumes",
+          {
+            params: {
+              q: this.search
+            }
+          }
+        );
+        this.GSResults = res.items;
       } catch (e) {
         this.$notify.error({
-          title: "Error while getting GoodReads results",
+          title: "Error while getting Google books results",
           message: e
         });
         this.$store.commit("appendLog", {
@@ -121,7 +157,8 @@ export default {
       }
     },
 
-    async download(event, result, i) {
+    // download from a google books result
+    async GBDownload(event, result, i) {
       // it's over, old man (prevent our user from clicking again on the button)
       if (this.processing !== 0 && event) return;
 
@@ -129,12 +166,17 @@ export default {
       if (!this.retryDownload) {
         if (this.processing !== 0) return;
 
-        this.selectedBookTitle = result.title.toLocaleLowerCase();
+        this.selectedBookTitle = result.volumeInfo.title.toLocaleLowerCase();
+
+        // some books have no authors
+        let mainAuthor = result.volumeInfo.authors
+          ? result.volumeInfo.authors[0]
+          : "";
 
         this.formattedSearch = (
-          result.author +
+          mainAuthor +
           " " +
-          result.title
+          result.volumeInfo.title
         ).toLocaleLowerCase();
         // remove characters that could compromise the search
         // search = search.replace(/(-|\)|:|\(|_)/, '');
@@ -170,6 +212,39 @@ export default {
         log: 'Starting search for "' + search + '"'
       });
 
+      await this.searchTorznab(search);
+
+      if (this.torznabResults.length === 0) {
+        if (this.retryDownload) {
+          this.retryFailed = true;
+        } else {
+          this.retryDownload = true;
+          this.GBDownload(null, null, null);
+        }
+        this.$store.commit("appendLog", {
+          level: "WARN",
+          log: "No result for this query."
+        });
+      } else {
+        this.processing++;
+        this.$store.commit("appendLog", {
+          level: "INFO",
+          log:
+            "Found " +
+            this.torznabResults.length +
+            " result" +
+            (this.torznabResults.length === 1 ? "" : "s") +
+            " !"
+        });
+
+        // we can send automatically the download to the bittorrent client
+        if (!this.retryDownload) {
+          this.addTorrent(this.torznabResults[0].enclosure);
+        }
+      }
+    },
+
+    async searchTorznab(search) {
       try {
         let res = await this.$axios.$post("/api/torznab/", {
           q: search,
@@ -181,35 +256,6 @@ export default {
           this.torznabProvider = res.provider;
           this.torznabResults = res.items;
           console.log(res);
-
-          if (this.torznabResults.length === 0) {
-            if (this.retryDownload) {
-              this.retryFailed = true;
-            } else {
-              this.retryDownload = true;
-              this.download(null, null, null);
-            }
-            this.$store.commit("appendLog", {
-              level: "WARN",
-              log: "No result for this query."
-            });
-          } else {
-            this.processing++;
-            this.$store.commit("appendLog", {
-              level: "INFO",
-              log:
-                "Found " +
-                this.torznabResults.length +
-                " result" +
-                (this.torznabResults.length === 1 ? "" : "s") +
-                " !"
-            });
-
-            // we can send automatically the download to the bittorrent client
-            if (!this.retryDownload) {
-              this.addTorrent(this.torznabResults[0].enclosure);
-            }
-          }
         } else {
           console.log(res.error);
           this.$notify.error({
@@ -337,6 +383,10 @@ h1 {
   margin-bottom: 30px;
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.missing-cover {
+  width: 50%;
 }
 
 .book-list .el-button {

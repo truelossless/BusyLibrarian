@@ -25,7 +25,7 @@ export const state = () => ({
             password: ''
         }
     },
-    version: 'v1.0'
+    version: 'v1.1'
 });
 
 export const mutations = {

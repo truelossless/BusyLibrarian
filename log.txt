@@ -1,0 +1,27 @@
+2020-06-11 15:05:13 verbose: Rejecting a badly formed API request
+2020-06-11 15:05:31 verbose: Rejecting a badly formed API request
+2020-06-11 15:05:31 verbose: Rejecting a badly formed API request
+2020-06-11 15:07:04 verbose: Rejecting a badly formed API request
+2020-06-11 15:07:04 verbose: Rejecting a badly formed API request
+2020-06-11 15:07:20 verbose: Rejecting a badly formed API request
+2020-06-11 15:07:22 verbose: Rejecting a badly formed API request
+2020-06-11 15:07:22 verbose: Rejecting a badly formed API request
+2020-06-11 15:07:22 verbose: Rejecting a badly formed API request
+2020-06-11 15:07:22 verbose: Rejecting a badly formed API request
+2020-06-11 15:32:43 info: New settings saved to settings.json
+2020-06-11 15:35:55 info: New settings saved to settings.json
+2020-06-11 15:36:31 info: New settings saved to settings.json
+2020-06-11 15:41:04 info: New settings saved to settings.json
+2020-06-11 16:24:17 info: Added a torrent to transmission.
+2020-06-11 16:24:55 info: Added a torrent to transmission.
+2020-06-11 16:25:11 info: New settings saved to settings.json
+2020-06-11 16:26:27 info: Added a torrent to transmission.
+2020-06-11 16:36:31 info: Added a torrent to transmission.
+2020-06-11 16:36:47 error: Error with the download: Error: No id (6) found for torrent
+2020-06-11 16:36:47 error: Error with the download: Error: No id (6) found for torrent
+2020-06-11 16:37:07 info: Added a torrent to transmission.
+2020-06-11 16:40:45 info: New settings saved to settings.json
+2020-06-11 16:41:00 info: Added a torrent to transmission.
+2020-06-11 16:41:07 error: Error with the download: Error: No id (7) found for torrent
+2020-06-11 16:41:07 error: Error with the download: Error: No id (7) found for torrent
+2020-06-11 16:41:18 info: Added a torrent to transmission.
