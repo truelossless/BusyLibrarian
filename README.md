@@ -5,7 +5,7 @@
 Inspired by LazyLibrarian, and conceived as a simpler (and less complete) alternative.
 
 ## Features
-- Search GoodReads for your favorite books
+- Search Google Books for your favorite books
 - Download any selected book from your favorite torrent trackers
 - import automatically any downloaded book in your calibre library
 
